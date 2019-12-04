@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Activiy Recognition</string>
+    <string name="activity_unknown">Activity unknown</string>
+</resources>
