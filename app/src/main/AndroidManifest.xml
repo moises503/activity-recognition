@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="la.handy.activiyrecognition">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -23,8 +25,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BackgroundDetectedActivitiesService"/>
-        <service android:name=".DetectedActivitiesIntentService"/>
+        <service android:name=".services.BackgroundDetectedActivitiesService"/>
+        <service android:name=".services.DetectedActivitiesIntentService"/>
+        <service android:name=".services.LocationService"/>
     </application>
 
 </manifest>

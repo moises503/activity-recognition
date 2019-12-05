@@ -1,4 +1,4 @@
-package la.handy.activiyrecognition
+package la.handy.activiyrecognition.core
 
 import android.app.*
 import android.content.Context
@@ -9,6 +9,8 @@ import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import la.handy.activiyrecognition.MainActivity
+import la.handy.activiyrecognition.R
 
 class NotificationHandler(base: Context) : ContextWrapper(base) {
 
@@ -111,7 +113,12 @@ class NotificationHandler(base: Context) : ContextWrapper(base) {
                 .setStyle(Notification.BigTextStyle().bigText(message))
                 .setColor(Color.parseColor("#312445"))
                 .setSmallIcon(notificationIcon)
-                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                .setLargeIcon(
+                    BitmapFactory.decodeResource(
+                        resources,
+                        R.mipmap.ic_launcher
+                    )
+                )
                 .setShowWhen(true)
                 .setGroup(SUMMARY_GROUP_NAME)
                 .setAutoCancel(true)
@@ -176,5 +183,17 @@ class NotificationHandler(base: Context) : ContextWrapper(base) {
     companion object {
         val CHANNEL_HIGH_ID = "1"
         val CHANNEL_LOW_ID = "2"
+        private var notification: Notification? = null
+
+        fun getForegroundNotification(context: Context): Notification? {
+            notification?.let {
+                return it
+            }
+            notification = NotificationHandler(context).createNotification(
+                "Handy Activity Recognition esta activo actualmente",
+                "El servicio se esta ejecutando", true, MainActivity::class.java
+            )?.build()
+            return notification
+        }
     }
 }

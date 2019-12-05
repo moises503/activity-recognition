@@ -1,4 +1,4 @@
-package la.handy.activiyrecognition
+package la.handy.activiyrecognition.services
 
 import android.app.*
 import android.content.Intent
@@ -6,6 +6,10 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
+import la.handy.activiyrecognition.core.Constants
+import la.handy.activiyrecognition.MainActivity
+import la.handy.activiyrecognition.core.NotificationHandler
+import la.handy.activiyrecognition.R
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -15,12 +19,13 @@ class DetectedActivitiesIntentService : IntentService(TAG) {
 
     override fun onCreate() {
         super.onCreate()
-        notificationHandler = NotificationHandler(applicationContext)
+        notificationHandler =
+            NotificationHandler(applicationContext)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        return Service.START_STICKY
+        return START_STICKY
     }
 
     override fun onHandleIntent(intent: Intent?) {

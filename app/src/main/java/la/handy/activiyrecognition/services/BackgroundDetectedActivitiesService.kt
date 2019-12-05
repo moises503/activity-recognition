@@ -1,4 +1,4 @@
-package la.handy.activiyrecognition
+package la.handy.activiyrecognition.services
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -11,6 +11,8 @@ import android.os.PowerManager
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.location.ActivityRecognitionClient
+import la.handy.activiyrecognition.core.Constants
+import la.handy.activiyrecognition.core.NotificationHandler
 
 class BackgroundDetectedActivitiesService : Service() {
 
@@ -18,8 +20,6 @@ class BackgroundDetectedActivitiesService : Service() {
     private lateinit var mPendingIntent: PendingIntent
     private lateinit var mActivityRecognitionClient: ActivityRecognitionClient
     private var wakeLock: PowerManager.WakeLock? = null
-    private var notificationHandler: NotificationHandler? = null
-
 
     private var mBinder: IBinder = LocalBinder()
 
@@ -35,12 +35,10 @@ class BackgroundDetectedActivitiesService : Service() {
             mIntentService,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
-        notificationHandler = NotificationHandler(applicationContext)
-        val notification = notificationHandler?.createNotification(
-            "Handy Activity Recognition esta activo actualmente",
-            "El servicio se esta ejecutando", true, MainActivity::class.java
-        )?.build()
-        startForeground(1, notification)
+        startForeground(
+            Constants.NOTIFICATION_SERVICE_ID,
+            NotificationHandler.getForegroundNotification(this)
+        )
         requestActivityUpdatesButtonHandler()
     }
 
@@ -89,38 +87,5 @@ class BackgroundDetectedActivitiesService : Service() {
                 .show()
         }
     }
-
-    fun removeActivityUpdatesButtonHandler() {
-        val task = mActivityRecognitionClient.removeActivityUpdates(
-            mPendingIntent
-        )
-        try {
-            wakeLock?.let {
-                if (it.isHeld) {
-                    it.release()
-                }
-            }
-            stopForeground(true)
-            stopSelf()
-        } catch (e: Exception) {
-            Log.e("ACTIVITY_RECOGNITION", "Service stopped without being started: ${e.message}")
-        }
-        task?.addOnSuccessListener {
-            Toast.makeText(
-                applicationContext,
-                "Removed activity updates successfully!",
-                Toast.LENGTH_SHORT
-            )
-                .show()
-        }
-
-        task?.addOnFailureListener {
-            Toast.makeText(
-                applicationContext, "Failed to remove activity updates!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
 
 }
