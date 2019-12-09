@@ -2,6 +2,7 @@ package la.handy.activiyrecognition.core
 
 class Constants {
     companion object {
+        const val CONFIDENCE = 70
         const val NOTIFICATION_SERVICE_ID = 1094
         const val NEAR_LOCATION_MINIMUM_DISTANCE = 300.0f
         const val GEOFENCE_RADIUS = 300.0f
