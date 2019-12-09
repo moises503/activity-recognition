@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri.fromParts
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -18,7 +17,6 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import la.handy.activiyrecognition.core.isServiceRunning
-import la.handy.activiyrecognition.services.BackgroundDetectedActivitiesService
 import la.handy.activiyrecognition.services.LocationService
 
 
@@ -29,24 +27,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        startTracking()
         val intent = Intent(this.application, LocationService::class.java)
         if (!this.isServiceRunning(LocationService::class.java)) {
             this.application.startService(intent)
             this.application.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
         checkIfHasPermissionsAndStartLocationTracking()
-    }
-
-    private fun startTracking() {
-        Intent(applicationContext, BackgroundDetectedActivitiesService::class.java).also {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(it)
-                return
-            }
-            startService(it)
-        }
-        startService(intent)
     }
 
     private val serviceConnection = object : ServiceConnection {
