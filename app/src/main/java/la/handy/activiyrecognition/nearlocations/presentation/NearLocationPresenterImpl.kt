@@ -31,7 +31,11 @@ class NearLocationPresenterImpl(
                         .saveDateForLastNotificationSend(Date().toString("dd-MM-yyyy HH:mm:ss"))
                     view.sendNotifications(nearLocations)
                 }
+            } else {
+                applicationPreferences.showLogErrorMessage("Could not retrieve near locations")
             }
+        } else {
+            applicationPreferences.showLogErrorMessage("User is not in right schedule")
         }
     }
 }

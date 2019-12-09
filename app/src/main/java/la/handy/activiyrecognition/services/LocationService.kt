@@ -9,22 +9,35 @@ import android.location.LocationManager
 import android.os.Binder
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
-import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import la.handy.activiyrecognition.MainActivity
 import la.handy.activiyrecognition.core.Constants
 import la.handy.activiyrecognition.core.NotificationHandler
+import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
+import la.handy.activiyrecognition.nearlocations.domain.model.CustomerLocation
+import la.handy.activiyrecognition.nearlocations.presentation.NearLocationsPresenter
+import la.handy.activiyrecognition.nearlocations.presentation.view.NearLocationsView
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import java.util.*
 
 
+class LocationService : Service(), NearLocationsView {
 
-class LocationService : Service() {
     private val binder = LocationServiceBinder()
     private var locationListener: LocationListener? = null
     private var locationManager: LocationManager? = null
     private val geoFencePendingIntent: PendingIntent? = null
+    private var notificationHandler : NotificationHandler?= null
+    private var wakeLock: PowerManager.WakeLock? = null
+    private val nearLocationPresenter : NearLocationsPresenter
+            by inject { parametersOf(this) }
 
     override fun onBind(intent: Intent): IBinder? {
         return binder
@@ -40,8 +53,9 @@ class LocationService : Service() {
         override fun onLocationChanged(location: Location) {
             lastLocation = location
             Log.i(TAG, "LocationChanged: $location")
-            Toast.makeText(applicationContext, "LocationChanged: $location", Toast.LENGTH_LONG)
-                .show()
+            val coordinate = Coordinate(location.latitude, location.longitude)
+            nearLocationPresenter.detectNearLocations(coordinate)
+            Log.i(TAG, "Coordinate: $coordinate")
         }
 
         override fun onProviderDisabled(provider: String) {
@@ -68,10 +82,13 @@ class LocationService : Service() {
             Constants.NOTIFICATION_SERVICE_ID,
             NotificationHandler.getForegroundNotification(this)
         )
+        notificationHandler = NotificationHandler(this)
+        startWakeLock()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        stopWakeLock()
         if (locationManager != null) {
             try {
                 locationManager?.removeUpdates(locationListener!!)
@@ -82,10 +99,13 @@ class LocationService : Service() {
         }
     }
 
-    private fun initializeLocationManager() {
-        if (locationManager == null) {
-            locationManager =
-                applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    override fun startGeofence(coordinate: Coordinate) {
+        startGeofence(LatLng(coordinate.latitude, coordinate.longitude))
+    }
+
+    override fun sendNotifications(nearLocations: List<CustomerLocation>) {
+        nearLocations.forEach {
+            buildNotification(it.name)
         }
     }
 
@@ -107,6 +127,13 @@ class LocationService : Service() {
             Log.e(TAG, "gps provider does not exist " + ex.localizedMessage)
         }
 
+    }
+
+    private fun initializeLocationManager() {
+        if (locationManager == null) {
+            locationManager =
+                applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        }
     }
 
     private fun createGeofence(latLng: LatLng): Geofence {
@@ -141,9 +168,9 @@ class LocationService : Service() {
     private fun addGeofence(request: GeofencingRequest) {
         val client = LocationServices.getGeofencingClient(this)
         client.addGeofences(request, createGeofencePendingIntent()).addOnSuccessListener {
-
+            Log.d(TAG, "GEOFENCE_STARTED")
         }.addOnFailureListener {
-
+            Log.e(TAG, "Exception: ${it.localizedMessage}")
         }
     }
 
@@ -153,6 +180,42 @@ class LocationService : Service() {
         val geofenceRequest = createGeofenceRequest(geofence)
         addGeofence(geofenceRequest)
     }
+
+    private fun buildNotification(location : String) {
+        val notificationBuilder = notificationHandler?.createNotification(
+            "Te encuentras cerca del siguiente cliente",
+            location,
+            true,
+            MainActivity::class.java
+        )
+        notificationBuilder?.let {
+            val r = Random()
+            val notificationId = r.nextInt(80 - 65) + 65
+            NotificationManagerCompat.from(applicationContext).notify(notificationId, it.build())
+        }
+    }
+
+    private fun startWakeLock() {
+        wakeLock =
+            (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationService::lock").apply {
+                    acquire()
+                }
+            }
+    }
+
+    private fun stopWakeLock() {
+        try {
+            wakeLock?.let {
+                if (it.isHeld) {
+                    it.release()
+                }
+            }
+        } catch (e : Exception) {
+            Log.e(TAG, "Exception ${e.localizedMessage}")
+        }
+    }
+
 
     inner class LocationServiceBinder : Binder() {
         val service: LocationService

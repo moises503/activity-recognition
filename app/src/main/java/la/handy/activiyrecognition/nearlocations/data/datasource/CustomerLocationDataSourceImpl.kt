@@ -14,11 +14,11 @@ class CustomerLocationDataSourceImpl : CustomerLocationDataSource {
 
     private fun buildDummyInformation() : List<Location> {
         val locations : MutableList<Location> = mutableListOf()
-        locations.add(Location(19.908,18.909, "Location 1"))
-        locations.add(Location(19.908,18.909, "Location 2"))
-        locations.add(Location(19.908,18.909, "Location 3"))
-        locations.add(Location(19.908,18.909, "Location 4"))
-        locations.add(Location(19.908,18.909, "Location 5"))
+        locations.add(Location(18.980224, -98.246897, "Location 1"))
+        locations.add(Location(18.980351, -98.247202, "Location 2"))
+        locations.add(Location(18.980326, -98.246946, "Location 3"))
+        locations.add(Location(18.979638, -98.246580, "Location 4"))
+        locations.add(Location(18.979640, -98.246492, "Location 5"))
         return locations.toList()
     }
 }

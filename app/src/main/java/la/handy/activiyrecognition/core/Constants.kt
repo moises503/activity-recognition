@@ -7,7 +7,7 @@ class Constants {
         const val GEOFENCE_RADIUS = 300.0f
         const val GEOFENCE_MINIMUM_RADIUS = 299.0f
         const val INIT_HOUR = "09:00:00"
-        const val FINISH_HOUR = "18:00:00"
+        const val FINISH_HOUR = "23:59:00"
         const val USER_ON_VISIT = "user_on_visit"
         const val LAST_NOTIFICATION_SEND = "last_notification_send"
     }

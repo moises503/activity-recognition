@@ -46,7 +46,7 @@ class GeofenceTransitionService : IntentService(TAG) {
                 getGeofenceTransitionDetails(geoFenceTransition, triggeringGeofences)
             // Send notification details as a String
             val notificationBuilder = notificationHandler?.createNotification(
-                "Hemos detectado movimiento",
+                "Estas a punto de comenzar una visita a cliente",
                 geofenceTransitionDetails,
                 true,
                 MainActivity::class.java

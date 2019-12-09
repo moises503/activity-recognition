@@ -2,6 +2,7 @@ package la.handy.activiyrecognition.nearlocations.domain.usecase
 
 import la.handy.activiyrecognition.core.Constants
 import la.handy.activiyrecognition.core.toDate
+import la.handy.activiyrecognition.core.toString
 import la.handy.activiyrecognition.nearlocations.domain.repository.CustomerLocationRepository
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 import la.handy.activiyrecognition.nearlocations.domain.model.CustomerLocation
@@ -25,7 +26,8 @@ class CustomerLocationUseCaseImpl(
                 currentLocation,
                 customerCurrentLocation
             )
-            if (currentDistance == Constants.GEOFENCE_MINIMUM_RADIUS) {
+            distanceUtils.distanceLogs("$currentDistance")
+            if (currentDistance <= Constants.GEOFENCE_MINIMUM_RADIUS) {
                 return customerLocation
             }
         }
@@ -35,7 +37,8 @@ class CustomerLocationUseCaseImpl(
     override fun userIsOnRightSchedule(): Boolean {
         val initHour = Constants.INIT_HOUR.toDate("HH:mm:ss")
         val finishHour = Constants.FINISH_HOUR.toDate("HH:mm:ss")
-        val currentHour = Date()
+        val currentHourString = Date().toString("HH:mm:ss")
+        val currentHour = currentHourString.toDate("HH:mm:ss") ?: Date()
         return currentHour.after(initHour) && currentHour.before(finishHour)
     }
 
@@ -49,6 +52,7 @@ class CustomerLocationUseCaseImpl(
                 currentLocation,
                 currentCustomerLocation
             )
+            distanceUtils.distanceLogs("$currentDistance")
             if (currentDistance == Constants.NEAR_LOCATION_MINIMUM_DISTANCE) {
                 customerNearLocations.add(customerLocation)
             }
@@ -60,8 +64,9 @@ class CustomerLocationUseCaseImpl(
         if (dateTimeNotificationSend.isEmpty())
             return true
         val startDate = dateTimeNotificationSend.toDate("dd-MM-yyyy HH:mm:ss")?.time ?: 0L
-        val dateDiff = Date().time - startDate / (1000 * 60 * 60 * 24)
-        return TimeUnit.MILLISECONDS.toMinutes(dateDiff) >= 30
+        val dateDiff = Date().time - startDate
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(dateDiff)
+        return minutes >= 30
     }
 
 

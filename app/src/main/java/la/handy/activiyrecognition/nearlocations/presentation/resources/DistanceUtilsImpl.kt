@@ -1,6 +1,7 @@
 package la.handy.activiyrecognition.nearlocations.presentation.resources
 
 import android.location.Location
+import android.util.Log
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 
 class DistanceUtilsImpl : DistanceUtils {
@@ -15,5 +16,9 @@ class DistanceUtilsImpl : DistanceUtils {
         location2.latitude = coordinate2.latitude
         location2.longitude = coordinate2.longitude
         return location1.distanceTo(location2)
+    }
+
+    override fun distanceLogs(message: String) {
+        Log.e("LOCATION", "Distance: $message mts")
     }
 }

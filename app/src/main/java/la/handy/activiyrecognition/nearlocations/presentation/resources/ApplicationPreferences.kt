@@ -4,4 +4,5 @@ interface ApplicationPreferences {
     fun isUserOnVisit() : Boolean
     fun dateForLastNotification() : String
     fun saveDateForLastNotificationSend(date : String)
+    fun showLogErrorMessage(message : String)
 }
