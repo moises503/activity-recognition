@@ -28,8 +28,12 @@ fun providesApplicationPreferences(context: Context): ApplicationPreferences =
     ApplicationPreferencesImpl(context)
 
 fun providesCustomerLocationUseCase(
-    customerLocationRepository: CustomerLocationRepository, distanceUtils: DistanceUtils
-): CustomerLocationUseCase = CustomerLocationUseCaseImpl(customerLocationRepository, distanceUtils)
+    customerLocationRepository: CustomerLocationRepository, distanceUtils: DistanceUtils,
+    applicationPreferences: ApplicationPreferences
+): CustomerLocationUseCase = CustomerLocationUseCaseImpl(
+    customerLocationRepository,
+    distanceUtils, applicationPreferences
+)
 
 
 val nearLocationsModule = module {
@@ -37,8 +41,8 @@ val nearLocationsModule = module {
     single { providesCustomerLocationRepository(get()) }
     single { providesDistanceUtils() }
     single { providesApplicationPreferences(get()) }
-    single { providesCustomerLocationUseCase(get(), get()) }
-    factory<NearLocationsPresenter> {(v : NearLocationsView) ->
+    single { providesCustomerLocationUseCase(get(), get(), get()) }
+    factory<NearLocationsPresenter> { (v: NearLocationsView) ->
         NearLocationPresenterImpl(v, get(), get())
     }
 }

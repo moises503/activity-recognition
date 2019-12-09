@@ -2,9 +2,7 @@ package la.handy.activiyrecognition.nearlocations.presentation.resources
 
 import android.content.Context
 import android.util.Log
-import la.handy.activiyrecognition.core.getLastNotificationSend
-import la.handy.activiyrecognition.core.isUserOnVisit
-import la.handy.activiyrecognition.core.saveLastNotificationSend
+import la.handy.activiyrecognition.core.*
 
 class ApplicationPreferencesImpl(private val context: Context) : ApplicationPreferences {
 
@@ -19,4 +17,8 @@ class ApplicationPreferencesImpl(private val context: Context) : ApplicationPref
 
     override fun saveDateForLastNotificationSend(date: String) =
         context.saveLastNotificationSend(date)
+
+    override fun getUserMovement(): String = context.getMovementStatus()
+
+    override fun getDateOfStay(): String = context.getDateOfStay()
 }

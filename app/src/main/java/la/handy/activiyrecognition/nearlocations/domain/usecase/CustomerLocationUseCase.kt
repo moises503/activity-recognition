@@ -11,4 +11,5 @@ interface CustomerLocationUseCase {
         currentLocation: Coordinate,
         nearLocations: List<CustomerLocation>
     ): CustomerLocation?
+    fun isUserOnMovement() : Boolean
 }

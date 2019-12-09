@@ -1,15 +1,12 @@
 package la.handy.activiyrecognition.services
 
-import android.app.*
+import android.app.IntentService
 import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
-import la.handy.activiyrecognition.core.Constants
-import la.handy.activiyrecognition.MainActivity
-import la.handy.activiyrecognition.core.NotificationHandler
 import la.handy.activiyrecognition.R
+import la.handy.activiyrecognition.core.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -44,47 +41,44 @@ class DetectedActivitiesIntentService : IntentService(TAG) {
 
     private fun handleUserActivity(type: Int, confidence: Int) {
         var label = getString(R.string.activity_unknown)
+        var movement = Constants.ON_UNKNOWN
 
         when (type) {
             DetectedActivity.IN_VEHICLE -> {
                 label = "You are in Vehicle"
+                movement = Constants.ON_WALK
             }
             DetectedActivity.ON_BICYCLE -> {
                 label = "You are on Bicycle"
+                movement = Constants.ON_WALK
             }
             DetectedActivity.ON_FOOT -> {
                 label = "You are on Foot"
+                movement = Constants.ON_WALK
             }
             DetectedActivity.RUNNING -> {
                 label = "You are Running"
+                movement = Constants.ON_WALK
             }
             DetectedActivity.STILL -> {
                 label = "You are Still"
-            }
-            DetectedActivity.TILTING -> {
-                label = "Your phone is Tilted"
+                movement = Constants.ON_STAY
             }
             DetectedActivity.WALKING -> {
                 label = "You are Walking"
+                movement = Constants.ON_WALK
             }
             DetectedActivity.UNKNOWN -> {
                 label = "Unkown Activity"
+                movement = Constants.ON_UNKNOWN
             }
         }
-
         Log.e(TAG, "User activity: $label, Confidence: $confidence")
 
         if (confidence > Constants.CONFIDENCE) {
-            val notificationBuilder = notificationHandler?.createNotification(
-                "Hemos detectado movimiento",
-                label,
-                true,
-                MainActivity::class.java
-            )
-            notificationBuilder?.let {
-                val r = Random()
-                val notificationId = r.nextInt(80 - 65) + 65
-                NotificationManagerCompat.from(applicationContext).notify(notificationId, it.build())
+            this.saveMovementStatus(movement)
+            if (movement == Constants.ON_STAY) {
+                this.saveWhenUserIsStay(Date().toString("dd-MM-yyyy HH:mm:ss"))
             }
         }
     }

@@ -44,6 +44,20 @@ fun Context.userOnVisit(status : Boolean) =
 fun Context.saveLastNotificationSend(date : String) =
     this.getSharedPreferencesEditor().putString(Constants.LAST_NOTIFICATION_SEND, date).apply()
 
+fun Context.saveMovementStatus(status : String) =
+    this.getSharedPreferencesEditor().putString(Constants.MOVEMENT_STATUS, status).apply()
+
+fun Context.getMovementStatus() : String =
+    this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
+        .getString(Constants.MOVEMENT_STATUS, "") ?: ""
+
+fun Context.saveWhenUserIsStay(date : String) =
+    this.getSharedPreferencesEditor().putString(Constants.MOVEMENT_STAY_DATE, date).apply()
+
+fun Context.getDateOfStay() : String =
+    this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
+        .getString(Constants.MOVEMENT_STAY_DATE, "") ?: ""
+
 fun Context.isUserOnVisit() : Boolean =
     this.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
         .getBoolean(Constants.USER_ON_VISIT, false)

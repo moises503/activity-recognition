@@ -6,13 +6,16 @@ import la.handy.activiyrecognition.core.toString
 import la.handy.activiyrecognition.nearlocations.domain.repository.CustomerLocationRepository
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 import la.handy.activiyrecognition.nearlocations.domain.model.CustomerLocation
+import la.handy.activiyrecognition.nearlocations.presentation.resources.ApplicationPreferences
 import la.handy.activiyrecognition.nearlocations.presentation.resources.DistanceUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.round
 
 class CustomerLocationUseCaseImpl(
     private val customerLocationRepository: CustomerLocationRepository,
-    private val distanceUtils: DistanceUtils
+    private val distanceUtils: DistanceUtils,
+    private val applicationPreferences: ApplicationPreferences
 ) : CustomerLocationUseCase {
 
     override fun checkCustomerLocationForStartGeofence(
@@ -27,7 +30,7 @@ class CustomerLocationUseCaseImpl(
                 customerCurrentLocation
             )
             distanceUtils.distanceLogs("$currentDistance")
-            if (currentDistance <= Constants.GEOFENCE_MINIMUM_RADIUS) {
+            if (round(currentDistance) <= Constants.GEOFENCE_MINIMUM_RADIUS) {
                 return customerLocation
             }
         }
@@ -53,7 +56,7 @@ class CustomerLocationUseCaseImpl(
                 currentCustomerLocation
             )
             distanceUtils.distanceLogs("$currentDistance")
-            if (currentDistance == Constants.NEAR_LOCATION_MINIMUM_DISTANCE) {
+            if (round(currentDistance) == Constants.NEAR_LOCATION_MINIMUM_DISTANCE) {
                 customerNearLocations.add(customerLocation)
             }
         }
@@ -65,9 +68,26 @@ class CustomerLocationUseCaseImpl(
             return true
         val startDate = dateTimeNotificationSend.toDate("dd-MM-yyyy HH:mm:ss")?.time ?: 0L
         val dateDiff = Date().time - startDate
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(dateDiff)
-        return minutes >= 30
+        return TimeUnit.MILLISECONDS.toMinutes(dateDiff) >= 30
     }
 
+    override fun isUserOnMovement(): Boolean {
+        if (applicationPreferences.getUserMovement().isEmpty() ||
+            applicationPreferences.getUserMovement() == Constants.ON_UNKNOWN)
+            return true
+        return when {
+            applicationPreferences.getUserMovement() == Constants.ON_WALK -> true
+            applicationPreferences.getUserMovement() == Constants.ON_STAY -> {
+                !userIsStaying()
+            }
+            else -> false
+        }
+    }
 
+    private fun userIsStaying() : Boolean {
+        val startDate = applicationPreferences.getDateOfStay()
+            .toDate("dd-MM-yyyy HH:mm:ss")?.time ?: 0L
+        val dateDiff = Date().time - startDate
+        return TimeUnit.MILLISECONDS.toSeconds(dateDiff) <= Constants.SECONDS_FOR_STAYING
+    }
 }

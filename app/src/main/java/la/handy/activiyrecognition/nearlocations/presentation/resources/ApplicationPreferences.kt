@@ -5,4 +5,6 @@ interface ApplicationPreferences {
     fun dateForLastNotification() : String
     fun saveDateForLastNotificationSend(date : String)
     fun showLogErrorMessage(message : String)
+    fun getUserMovement() : String
+    fun getDateOfStay() : String
 }

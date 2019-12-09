@@ -28,6 +28,8 @@
 
         <service android:name=".services.LocationService"/>
         <service android:name=".services.GeofenceTransitionService"/>
+        <service android:name=".services.BackgroundDetectedActivitiesService"/>
+        <service android:name=".services.DetectedActivitiesIntentService"/>
 
     </application>
 
