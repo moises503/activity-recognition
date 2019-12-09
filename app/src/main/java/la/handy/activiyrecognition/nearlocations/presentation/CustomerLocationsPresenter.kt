@@ -2,6 +2,6 @@ package la.handy.activiyrecognition.nearlocations.presentation
 
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 
-interface NearLocationsPresenter {
+interface CustomerLocationsPresenter {
     fun detectNearLocations(currentLocation: Coordinate)
 }

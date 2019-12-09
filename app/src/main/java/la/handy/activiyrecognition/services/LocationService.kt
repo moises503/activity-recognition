@@ -21,14 +21,14 @@ import la.handy.activiyrecognition.core.Constants
 import la.handy.activiyrecognition.core.NotificationHandler
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 import la.handy.activiyrecognition.nearlocations.domain.model.CustomerLocation
-import la.handy.activiyrecognition.nearlocations.presentation.NearLocationsPresenter
-import la.handy.activiyrecognition.nearlocations.presentation.view.NearLocationsView
+import la.handy.activiyrecognition.nearlocations.presentation.CustomerLocationsPresenter
+import la.handy.activiyrecognition.nearlocations.presentation.view.CustomerLocationsView
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.util.*
 
 
-class LocationService : Service(), NearLocationsView {
+class LocationService : Service(), CustomerLocationsView {
 
     private val binder = LocationServiceBinder()
     private var locationListener: LocationListener? = null
@@ -36,7 +36,7 @@ class LocationService : Service(), NearLocationsView {
     private val geoFencePendingIntent: PendingIntent? = null
     private var notificationHandler : NotificationHandler?= null
     private var wakeLock: PowerManager.WakeLock? = null
-    private val nearLocationPresenter : NearLocationsPresenter
+    private val customerLocationPresenter : CustomerLocationsPresenter
             by inject { parametersOf(this) }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -54,7 +54,7 @@ class LocationService : Service(), NearLocationsView {
             lastLocation = location
             Log.i(TAG, "LocationChanged: $location")
             val coordinate = Coordinate(location.latitude, location.longitude)
-            nearLocationPresenter.detectNearLocations(coordinate)
+            customerLocationPresenter.detectNearLocations(coordinate)
             Log.i(TAG, "Coordinate: $coordinate")
         }
 
@@ -107,6 +107,10 @@ class LocationService : Service(), NearLocationsView {
         nearLocations.forEach {
             buildNotification(it.name)
         }
+    }
+
+    override fun showError(message: String) {
+        Log.e(TAG, message)
     }
 
     fun startTracking() {

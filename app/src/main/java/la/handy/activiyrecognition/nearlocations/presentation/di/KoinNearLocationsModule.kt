@@ -7,13 +7,13 @@ import la.handy.activiyrecognition.nearlocations.domain.datasource.CustomerLocat
 import la.handy.activiyrecognition.nearlocations.domain.repository.CustomerLocationRepository
 import la.handy.activiyrecognition.nearlocations.domain.usecase.CustomerLocationUseCase
 import la.handy.activiyrecognition.nearlocations.domain.usecase.CustomerLocationUseCaseImpl
-import la.handy.activiyrecognition.nearlocations.presentation.NearLocationPresenterImpl
-import la.handy.activiyrecognition.nearlocations.presentation.NearLocationsPresenter
+import la.handy.activiyrecognition.nearlocations.presentation.CustomerLocationsPresenterImpl
+import la.handy.activiyrecognition.nearlocations.presentation.CustomerLocationsPresenter
 import la.handy.activiyrecognition.nearlocations.presentation.resources.ApplicationPreferences
 import la.handy.activiyrecognition.nearlocations.presentation.resources.ApplicationPreferencesImpl
 import la.handy.activiyrecognition.nearlocations.presentation.resources.DistanceUtils
 import la.handy.activiyrecognition.nearlocations.presentation.resources.DistanceUtilsImpl
-import la.handy.activiyrecognition.nearlocations.presentation.view.NearLocationsView
+import la.handy.activiyrecognition.nearlocations.presentation.view.CustomerLocationsView
 import org.koin.dsl.module
 
 fun providesCustomerLocationDataSource(): CustomerLocationDataSource =
@@ -42,7 +42,7 @@ val nearLocationsModule = module {
     single { providesDistanceUtils() }
     single { providesApplicationPreferences(get()) }
     single { providesCustomerLocationUseCase(get(), get(), get()) }
-    factory<NearLocationsPresenter> { (v: NearLocationsView) ->
-        NearLocationPresenterImpl(v, get(), get())
+    factory<CustomerLocationsPresenter> { (v: CustomerLocationsView) ->
+        CustomerLocationsPresenterImpl(v, get(), get())
     }
 }

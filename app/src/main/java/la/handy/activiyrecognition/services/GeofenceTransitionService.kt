@@ -24,27 +24,20 @@ class GeofenceTransitionService : IntentService(TAG) {
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        // Retrieve the Geofencing intent
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
 
-        // Handling errors
         if (geofencingEvent.hasError()) {
             val errorMsg = getErrorString(geofencingEvent.errorCode)
             Log.e(TAG, errorMsg)
             return
         }
 
-        // Retrieve GeofenceTrasition
         val geoFenceTransition = geofencingEvent.geofenceTransition
-        // Check if the transition type
         if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER
             || geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            // Get the geofence that were triggered
             val triggeringGeofences = geofencingEvent.triggeringGeofences
-            // Create a detail message with Geofences received
             val geofenceTransitionDetails =
                 getGeofenceTransitionDetails(geoFenceTransition, triggeringGeofences)
-            // Send notification details as a String
             val notificationBuilder = notificationHandler?.createNotification(
                 "Estas a punto de comenzar una visita a cliente",
                 geofenceTransitionDetails,
@@ -59,12 +52,10 @@ class GeofenceTransitionService : IntentService(TAG) {
         }
     }
 
-    // Create a detail message with Geofences received
     private fun getGeofenceTransitionDetails(
         geoFenceTransition: Int,
         triggeringGeofences: List<Geofence>
     ): String {
-        // get the ID of each geofence triggered
         val triggeringGeofencesList: MutableList<String> = mutableListOf()
         for (geofence in triggeringGeofences) {
             triggeringGeofencesList.add(geofence.requestId)

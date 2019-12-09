@@ -4,14 +4,14 @@ import la.handy.activiyrecognition.core.toString
 import la.handy.activiyrecognition.nearlocations.domain.model.Coordinate
 import la.handy.activiyrecognition.nearlocations.domain.usecase.CustomerLocationUseCase
 import la.handy.activiyrecognition.nearlocations.presentation.resources.ApplicationPreferences
-import la.handy.activiyrecognition.nearlocations.presentation.view.NearLocationsView
+import la.handy.activiyrecognition.nearlocations.presentation.view.CustomerLocationsView
 import java.util.*
 
-class NearLocationPresenterImpl(
-    private val view: NearLocationsView,
+class CustomerLocationsPresenterImpl(
+    private val view: CustomerLocationsView,
     private val applicationPreferences: ApplicationPreferences,
     private val nearLocationsUseCase: CustomerLocationUseCase
-) : NearLocationsPresenter {
+) : CustomerLocationsPresenter {
 
     override fun detectNearLocations(currentLocation: Coordinate) {
         if (nearLocationsUseCase.userIsOnRightSchedule()) {
@@ -33,13 +33,13 @@ class NearLocationPresenterImpl(
                         view.sendNotifications(nearLocations)
                     }
                 } else {
-                    applicationPreferences.showLogErrorMessage("Could not retrieve near locations")
+                    view.showError("Could not retrieve near locations")
                 }
             } else {
-                applicationPreferences.showLogErrorMessage("User is staying")
+                view.showError("User is staying")
             }
         } else {
-            applicationPreferences.showLogErrorMessage("User is not in right schedule")
+            view.showError("User is not in right schedule")
         }
     }
 }
