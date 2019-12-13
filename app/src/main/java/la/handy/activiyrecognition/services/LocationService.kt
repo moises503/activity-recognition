@@ -125,6 +125,8 @@ class LocationService : Service(), CustomerLocationsView {
                 locationListener!!
             )
 
+            Log.d(TAG, "Location tracking started")
+
         } catch (ex: SecurityException) {
             Log.e(TAG, "fail to request location update, ignore", ex)
         } catch (ex: IllegalArgumentException) {
