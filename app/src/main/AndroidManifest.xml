@@ -35,11 +35,15 @@
         <service android:name=".services.BackgroundDetectedActivitiesService"/>
         <service android:name=".services.DetectedActivitiesIntentService"/>
 
-        <receiver android:enabled="true" android:name=".receivers.StartReceiver">
-            <intent-filter>
+        <receiver android:enabled="true" android:exported="true" android:name=".receivers.StartReceiver">
+            <intent-filter android:priority="1">
+                <category android:name="android.intent.category.DEFAULT"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <!--For HTC devices-->
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.intent.action.REBOOT"/>
             </intent-filter>
         </receiver>
 

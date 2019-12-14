@@ -1,14 +1,10 @@
 package la.handy.activiyrecognition
 
 import android.Manifest.permission.*
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri.fromParts
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -27,41 +23,32 @@ import la.handy.activiyrecognition.services.LocationService
 
 class MainActivity : AppCompatActivity() {
 
-    private var locationService: LocationService? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val intent = Intent(this.application, LocationService::class.java)
-        if (!this.isServiceRunning(LocationService::class.java)) {
-            this.application.startService(intent)
-            this.application.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
         checkIfHasPermissionsAndStartLocationTracking()
     }
 
     private fun startRecognitionTracking() {
-        Intent(applicationContext, BackgroundDetectedActivitiesService::class.java).also {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(it)
-                return
+        if (!this@MainActivity.isServiceRunning(BackgroundDetectedActivitiesService::class.java)) {
+            Intent(applicationContext, BackgroundDetectedActivitiesService::class.java).also {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(it)
+                    return
+                }
+                startService(it)
             }
-            startService(it)
         }
-        startService(intent)
     }
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val name = className.className
-            if (name.endsWith("LocationService")) {
-                locationService = (service as LocationService.LocationServiceBinder).service
-            }
-        }
-
-        override fun onServiceDisconnected(className: ComponentName) {
-            if (className.className == "LocationService") {
-                locationService = null
+    private fun startServiceTracking() {
+        if (!this@MainActivity.isServiceRunning(LocationService::class.java)) {
+            Intent(applicationContext, LocationService::class.java).also {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(it)
+                    return
+                }
+                startService(it)
             }
         }
     }
@@ -69,19 +56,24 @@ class MainActivity : AppCompatActivity() {
     private fun checkIfHasPermissionsAndStartLocationTracking() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Dexter.withActivity(this)
-                .withPermissions(ACCESS_FINE_LOCATION, ACCESS_BACKGROUND_LOCATION, ACTIVITY_RECOGNITION)
+                .withPermissions(
+                    ACCESS_FINE_LOCATION,
+                    ACCESS_BACKGROUND_LOCATION,
+                    ACTIVITY_RECOGNITION
+                )
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         report?.let {
                             if (it.deniedPermissionResponses.isEmpty()) {
                                 startRecognitionTracking()
-                                locationService?.startTracking()
+                                startServiceTracking()
                             } else {
                                 openSettings()
                             }
                         }
 
                     }
+
                     override fun onPermissionRationaleShouldBeShown(
                         permissions: MutableList<PermissionRequest>?,
                         token: PermissionToken?
@@ -95,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 .withListener(object : PermissionListener {
                     override fun onPermissionGranted(response: PermissionGrantedResponse) {
                         startRecognitionTracking()
-                        locationService?.startTracking()
+                        startServiceTracking()
                     }
 
                     override fun onPermissionDenied(response: PermissionDeniedResponse) {
@@ -127,12 +119,14 @@ class MainActivity : AppCompatActivity() {
     private fun showPermissionRationale(token: PermissionToken?) {
         AlertDialog.Builder(this).setTitle(R.string.permission_rationale_title)
             .setMessage(R.string.permission_rationale_message)
-            .setNegativeButton(android.R.string.cancel
+            .setNegativeButton(
+                android.R.string.cancel
             ) { dialog, _ ->
                 dialog.dismiss()
                 token?.cancelPermissionRequest()
             }
-            .setPositiveButton(android.R.string.ok
+            .setPositiveButton(
+                android.R.string.ok
             ) { dialog, _ ->
                 dialog.dismiss()
                 token?.continuePermissionRequest()

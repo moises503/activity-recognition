@@ -84,6 +84,7 @@ class LocationService : Service(), CustomerLocationsView {
         )
         notificationHandler = NotificationHandler(this)
         startWakeLock()
+        startTracking()
     }
 
     override fun onDestroy() {
