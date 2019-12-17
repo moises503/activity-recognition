@@ -39,7 +39,7 @@ class GeofenceTransitionService : IntentService(TAG) {
             val geofenceTransitionDetails =
                 getGeofenceTransitionDetails(geoFenceTransition, triggeringGeofences)
             val notificationBuilder = notificationHandler?.createNotification(
-                "Estas a punto de comenzar una visita a cliente",
+                "Cliente listo para visita",
                 geofenceTransitionDetails,
                 true,
                 MainActivity::class.java

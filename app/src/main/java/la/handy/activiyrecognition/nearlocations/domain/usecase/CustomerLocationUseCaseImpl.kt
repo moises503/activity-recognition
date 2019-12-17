@@ -55,8 +55,8 @@ class CustomerLocationUseCaseImpl(
                 currentLocation,
                 currentCustomerLocation
             )
-            distanceUtils.distanceLogs("$currentDistance")
-            if (round(currentDistance) == Constants.NEAR_LOCATION_MINIMUM_DISTANCE) {
+            distanceUtils.distanceLogs("${round(currentDistance)}")
+            if (round(currentDistance) <= Constants.NEAR_LOCATION_MINIMUM_DISTANCE) {
                 customerNearLocations.add(customerLocation)
             }
         }
